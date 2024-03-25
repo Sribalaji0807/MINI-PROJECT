@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class DBservice {
   final String? id;
@@ -49,15 +50,48 @@ class DBservice {
             .where('name',
                 isEqualTo: username) // Query based on field and value
             .get();
-    
-    DocumentReference documentRef = _usersCollection.doc(querySnapshot.docs[0].id);
+
+    DocumentReference documentRef =
+        _usersCollection.doc(querySnapshot.docs[0].id);
     print(documentRef);
     // // Use update method to add data to a specific field (e.g., "mailbox")
+    DocumentReference doc1 =  _usersCollection.doc(id);
+    await doc1.update({
+      'mailbox':FieldValue.arrayUnion([dataToAdd])
+    });
     return await documentRef
         .update({
           'mailbox': FieldValue.arrayUnion([dataToAdd])
         })
         .then((value) => "Data added to mailbox")
         .catchError((error) => "Failed to add data to mailbox: $error");
+  }
+
+  Future<List<Map<String, dynamic>>?> getusermessage(String? id) async {
+    print(id);
+    if (kIsWeb) {
+      final documentSnapshot =
+          await FirebaseFirestore.instance.collection('users').doc(id).get();
+      print("hello");
+      print(documentSnapshot);
+      final mailboxData = documentSnapshot.data() as Map<String, dynamic>?;
+      print(mailboxData);
+      final List<Map<String, dynamic>>? messages =
+          (mailboxData?['mailbox'] as List<dynamic>?)
+              ?.cast<Map<String, dynamic>>(); // Ensure correct type
+      print(messages);
+      return messages;
+    } else {
+      final documentSnapshot = await _usersCollection.doc(id).get();
+      print("hello");
+      print(documentSnapshot);
+      final mailboxData = documentSnapshot.data() as Map<String, dynamic>?;
+      print(mailboxData);
+      final List<Map<String, dynamic>>? messages =
+          (mailboxData?['mailbox'] as List<dynamic>?)
+              ?.cast<Map<String, dynamic>>(); // Ensure correct type
+      print(messages);
+      return messages;
+    }
   }
 }

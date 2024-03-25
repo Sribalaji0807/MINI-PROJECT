@@ -59,6 +59,7 @@ class Authservice {
         password: password,
       );
       String? userId = user.user?.uid;
+      print("--------------------------");
       print("User login successful");
       print(userId);
 

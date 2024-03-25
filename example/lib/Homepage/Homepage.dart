@@ -1,5 +1,6 @@
 import 'package:example/Database/DatabaseService.dart';
 import 'package:example/Homepage/chatpage.dart';
+import 'package:example/authenticationui/login.dart';
 import 'package:example/userdata/userinfo.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,9 +31,27 @@ class _HomePageState extends State<HomePage> {
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? id = prefs.getString('userid');
-      DBservice db = DBservice(id: id!);
+      print(id);
+      DBservice db = DBservice(id: id);
       return db.getContacts(id);
     }
+  }
+
+  void signOut() async {
+    if (kIsWeb) {
+      html.window.localStorage.remove('userid');
+      html.window.localStorage.remove('username');
+    } else {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove('userid');
+      prefs.remove('username');
+      prefs.remove('useremail');
+      prefs.setBool('isLoggedIn', false);
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Register()),
+    );
   }
 
   @override
@@ -40,6 +59,12 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: signOut,
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -85,15 +110,6 @@ class _HomePageState extends State<HomePage> {
                 }
               },
             ),
-          ),
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Message',
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {},
-            child: const Text('Send'),
           ),
         ],
       ),
