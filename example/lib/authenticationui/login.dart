@@ -8,23 +8,23 @@ void main() {
 }
 
 class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+  const Register({super.key});
 
   @override
   State<Register> createState() => _RegisterState();
 }
 
 class _RegisterState extends State<Register> {
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   final Authservice _auth = Authservice();
 
   Future<dynamic> login() async {
     String message = await _auth.register(_nameController.text,
         _emailController.text, _passwordController.text) as String;
-    if (message != null) {
+    if (message.isNotEmpty) {
       return message;
     } else {
       return "error";
@@ -75,11 +75,11 @@ class _RegisterState extends State<Register> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(message)),
                   );
-                    Navigator.push(
+                  Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
+                    MaterialPageRoute(builder: (context) => const HomePage()),
                   );
-                
+
                   // ScaffoldMessenger.of(context).showSnackBar(
                   //   SnackBar(content: Text('Signed in as ${userCredential.user?.email}')),
                 } on FirebaseAuthException catch (e) {
@@ -94,7 +94,7 @@ class _RegisterState extends State<Register> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Login()),
+                  MaterialPageRoute(builder: (context) => const Login()),
                 );
               },
               child: const Text('Login'),
@@ -148,18 +148,25 @@ class _LoginState extends State<Login> {
             ElevatedButton(
               onPressed: () async {
                 try {
-                  String message = await _auth.login(
-                          _emailController.text, _passwordController.text)
-                      as String;
-                  print(message);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('User registered successfully')),
-                  );
+                  if (_emailController.text.isNotEmpty &&
+                      _passwordController.text.isNotEmpty) {
+                    String message = await _auth.login(
+                            _emailController.text, _passwordController.text)
+                        as String;
+                    print(message);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('User registered successfully')),
+                    );
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("please enter the credential")));
+                  }
                   // ScaffoldMessenger.of(context).showSnackBar(
                   //   SnackBar(content: Text('Signed in as ${userCredential.user?.email}')),
                 } on FirebaseAuthException catch (e) {

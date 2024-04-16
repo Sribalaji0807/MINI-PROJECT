@@ -1,7 +1,6 @@
 import 'package:example/Database/DatabaseService.dart';
 import 'package:example/Homepage/chatpage.dart';
 import 'package:example/authenticationui/login.dart';
-import 'package:example/userdata/userinfo.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,7 +30,6 @@ class _HomePageState extends State<HomePage> {
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? id = prefs.getString('userid');
-      print(id);
       DBservice db = DBservice(id: id);
       return db.getContacts(id);
     }
@@ -41,11 +39,13 @@ class _HomePageState extends State<HomePage> {
     if (kIsWeb) {
       html.window.localStorage.remove('userid');
       html.window.localStorage.remove('username');
+      html.window.localStorage.remove('useremail');
+      html.window.localStorage['isLoggedIn'] = 'false';
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.remove('userid');
-      prefs.remove('username');
-      prefs.remove('useremail');
+      prefs.setString('userid','');
+      prefs.setString('username','');
+      prefs.setString('useremail','');
       prefs.setBool('isLoggedIn', false);
     }
     Navigator.push(

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_html/html.dart' as html;
+import 'dart:async';
+import 'package:example/cryptography/symmetric.dart';
 
 class ChatPage extends StatefulWidget {
   final String personName;
@@ -19,7 +21,7 @@ class _ChatPageState extends State<ChatPage> {
   String? id;
   String? name;
   List<Map<String, dynamic>> messages = [];
-
+  late Timer _timer;
   @override
   void initState() {
     super.initState();
@@ -30,6 +32,23 @@ class _ChatPageState extends State<ChatPage> {
       getId();
       getname();
     }
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer when the widget is disposed to prevent memory leaks
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    // Create a timer that executes a function every 1 second
+    _timer = Timer.periodic(Duration(seconds: 4), (timer) {
+      setState(() {
+        getMessages(id!);
+      });
+    });
   }
 
   Future<void> getId() async {
@@ -88,7 +107,7 @@ class _ChatPageState extends State<ChatPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     padding: EdgeInsets.all(8),
-                    child: Text(message["text"]),
+                    child: Text(decrypt(message["text"],message["key"],message["iv"])),
                   ),
                 );
               },
@@ -110,8 +129,11 @@ class _ChatPageState extends State<ChatPage> {
                   String formattedTime =
                       DateFormat('HH:mm:ss').format(DateTime.now());
                   print(name);
-                  Map<String, dynamic> message = {
-                    'text': _messageController.text,
+                  List list=crypto(_messageController.text);
+                  Map<String,dynamic> message = {
+                    'text': list[1] ,
+                    'key': list[0],
+                    'iv':list[2],
                     'sendby': name,
                     'destination': widget.personName,
                     'time': formattedTime

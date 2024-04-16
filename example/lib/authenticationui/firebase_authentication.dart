@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_html/html.dart' as html;
 
 // Import your UserInfoData and DBservice classes
-import 'package:example/userdata/userinfo.dart';
 import 'package:example/Database/DatabaseService.dart';
 
 class Authservice {
