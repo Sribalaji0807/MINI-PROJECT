@@ -1,6 +1,8 @@
 import 'package:encrypt/encrypt.dart';
 import 'dart:math';
 
+import 'package:example/cryptography/asymmetric.dart';
+
 class symmetric {}
 
 String generateRandomString(int length) {
@@ -14,7 +16,7 @@ String generateRandomString(int length) {
   return String.fromCharCodes(chars);
 }
 
-List crypto(String text) {
+Future<List> crypto(String text) async {
   final key1 = generateRandomString(32);
   print(key1);
   final key = Key.fromUtf8(key1);
@@ -27,15 +29,17 @@ List crypto(String text) {
   print(decrypted); // Lorem ipsum dolor sit amet, consectetur adipiscing elit
   print(encrypted
       .base64); // R4PxiU3h8YoIRqVowBXm36ZcCeNeZ4s1OvVBTfFlZRdmohQqOpPQqD1YecJeZMAop/hZ4OxqgC1WtwvX/hP9mw==
-  List list = [key1, encrypted.base64, iv.base64];
+String keyenc = await asymmetric(key1);
+  List list = [keyenc, encrypted.base64, iv.base64];
   return list;
 }
 
-String decrypt(String text, String k, String v) {
-  final key = k;
+Future<String> decrypt(String text, String k, String v) async{
+  final key = await asymmetricdecrypt(k);
   final encrypted = Encrypted.fromBase64(text);
   final iv = IV.fromBase64(v); // Decode IV from base64
-  final encrypter = Encrypter(AES(Key.fromUtf8(key)));
+  final encrypter = Encrypter(AES(Key.fromUtf8(key as String)));
   final decrypted = encrypter.decrypt(encrypted, iv: iv);
+  print(decrypted);
   return decrypted;
 }

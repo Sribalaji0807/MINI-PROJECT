@@ -1,6 +1,7 @@
 import 'package:example/Database/DatabaseService.dart';
 import 'package:example/Homepage/chatpage.dart';
 import 'package:example/authenticationui/login.dart';
+import 'package:example/qrcode/Qr_codegenerator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,10 +61,17 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Chat'),
         actions: [
+           IconButton(
+            icon: Icon(Icons.qr_code),
+            onPressed: () {
+           //  Navigator.push(context, MaterialPageRoute(builder: (context) => QrCodeGenerator()));
+              },
+          ),
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: signOut,
           ),
+          
         ],
       ),
       body: Column(

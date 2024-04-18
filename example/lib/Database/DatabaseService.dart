@@ -55,9 +55,9 @@ class DBservice {
         _usersCollection.doc(querySnapshot.docs[0].id);
     print(documentRef);
     // // Use update method to add data to a specific field (e.g., "mailbox")
-    DocumentReference doc1 =  _usersCollection.doc(id);
+    DocumentReference doc1 = _usersCollection.doc(id);
     await doc1.update({
-      'mailbox':FieldValue.arrayUnion([dataToAdd])
+      'mailbox': FieldValue.arrayUnion([dataToAdd])
     });
     return await documentRef
         .update({
@@ -72,26 +72,31 @@ class DBservice {
     if (kIsWeb) {
       final documentSnapshot =
           await FirebaseFirestore.instance.collection('users').doc(id).get();
-      print("hello");
-      print(documentSnapshot);
+    //  print("hello");
+      //print(documentSnapshot);
       final mailboxData = documentSnapshot.data() as Map<String, dynamic>?;
-      print(mailboxData);
+    //  print(mailboxData);
       final List<Map<String, dynamic>>? messages =
           (mailboxData?['mailbox'] as List<dynamic>?)
               ?.cast<Map<String, dynamic>>(); // Ensure correct type
-      print(messages);
+    //  print(messages);
       return messages;
     } else {
       final documentSnapshot = await _usersCollection.doc(id).get();
-      print("hello");
-      print(documentSnapshot);
+   //   print("hello");
+     // print(documentSnapshot);
       final mailboxData = documentSnapshot.data() as Map<String, dynamic>?;
-      print(mailboxData);
+      //print(mailboxData);
       final List<Map<String, dynamic>>? messages =
           (mailboxData?['mailbox'] as List<dynamic>?)
               ?.cast<Map<String, dynamic>>(); // Ensure correct type
-      print(messages);
+      //print(messages);
       return messages;
     }
   }
+
+ Future<void> setPublicKey( String key) async {
+  return _usersCollection.doc(id).update({'publickey': key});
+}
+
 }
