@@ -78,8 +78,6 @@ class Authservice {
         await prefs.setString('username', name);
         await prefs.setString('useremail', email);
         await prefs.setBool('isLoggedIn', true);
-                fetchKeys();
-
       } else {
         // For web platform (using LocalStorage)
         html.window.localStorage['userid'] = userId ?? '';
@@ -102,11 +100,11 @@ class Authservice {
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);    
+      final body = jsonDecode(response.body);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('publickey', body['public']);
       await prefs.setString('privatekey', body['private']);
-      String? id =prefs.getString('userid');
+      String? id = prefs.getString('userid');
       DBservice db = DBservice(id: id);
       db.setPublicKey(body['public']);
     } else {

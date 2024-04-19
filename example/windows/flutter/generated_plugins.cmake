@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   cloud_firestore
+  fast_rsa
   firebase_auth
   firebase_core
 )

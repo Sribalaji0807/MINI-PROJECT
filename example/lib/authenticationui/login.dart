@@ -150,6 +150,7 @@ class _LoginState extends State<Login> {
                 try {
                   if (_emailController.text.isNotEmpty &&
                       _passwordController.text.isNotEmpty) {
+                    print("-------");
                     String message = await _auth.login(
                             _emailController.text, _passwordController.text)
                         as String;

@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
     if (kIsWeb) {
       String id = html.window.localStorage['userid'] as String;
       DBservice db = DBservice(id: id);
+      db.getContacts1(id);
       return db.getContacts(id);
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -44,9 +45,9 @@ class _HomePageState extends State<HomePage> {
       html.window.localStorage['isLoggedIn'] = 'false';
     } else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('userid','');
-      prefs.setString('username','');
-      prefs.setString('useremail','');
+      prefs.setString('userid', '');
+      prefs.setString('username', '');
+      prefs.setString('useremail', '');
       prefs.setBool('isLoggedIn', false);
     }
     Navigator.push(
@@ -61,17 +62,16 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Chat'),
         actions: [
-           IconButton(
+          IconButton(
             icon: Icon(Icons.qr_code),
             onPressed: () {
-           //  Navigator.push(context, MaterialPageRoute(builder: (context) => QrCodeGenerator()));
-              },
+              //  Navigator.push(context, MaterialPageRoute(builder: (context) => QrCodeGenerator()));
+            },
           ),
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: signOut,
           ),
-          
         ],
       ),
       body: Column(
@@ -105,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                           // Add your onclick logic here
                         },
                         child: ListTile(
-                          leading: CircleAvatar(
+                          leading: const CircleAvatar(
                             child: Icon(Icons.person),
                           ),
                           title: Text(snapshot.data![index]),

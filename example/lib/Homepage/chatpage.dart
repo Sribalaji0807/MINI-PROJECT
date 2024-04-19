@@ -45,7 +45,7 @@ class _ChatPageState extends State<ChatPage> {
 
   void _startTimer() {
     // Create a timer that executes a function every 1 second
-    _timer = Timer.periodic(Duration(seconds: 600), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 10), (timer) {
       setState(() {
         getMessages(id!);
       });
@@ -63,6 +63,7 @@ class _ChatPageState extends State<ChatPage> {
     List<Map<String, dynamic>>? fetchedMessages = await db.getusermessage(id);
     setState(() {
       messages = fetchedMessages!;
+      print(messages);
     });
   }
 
@@ -90,42 +91,41 @@ class _ChatPageState extends State<ChatPage> {
         children: <Widget>[
           Expanded(
             child: ListView.builder(
-  itemCount: messages.length,
-  itemBuilder: (context, index) {
-    final message = messages[index];
-    final bool isSentByUser = message['sendby'] != widget.personName;
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                final bool isSentByUser =
+                    message['sendby'] != widget.personName;
 
-    return FutureBuilder<String>(
-      future: messagedecrypt(
-        message["text"],
-        message["key"],
-        message["iv"],
-      ),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Or any loading indicator
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          return Align(
-            alignment: isSentByUser
-                ? Alignment.centerRight
-                : Alignment.centerLeft,
-            child: Container(
-              margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-              decoration: BoxDecoration(
-                color: isSentByUser ? Colors.blue[100] : Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: EdgeInsets.all(8),
-              child: Text(snapshot.data!),
+                return FutureBuilder<String>(
+                  future: messagedecrypt(
+                    message["text"],
+                    message["key"],
+                    message["iv"],
+                  ),
+                  builder: (context, snapshot) {
+                      return Align(
+                        alignment: isSentByUser
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: Container(
+                          margin:
+                              EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                          decoration: BoxDecoration(
+                            color: isSentByUser
+                                ? Colors.blue[100]
+                                : Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: EdgeInsets.all(8),
+                          child: Text(snapshot.data!),
+                        ),
+                      );
+                    }
+                  
+                );
+              },
             ),
-          );
-        }
-      },
-    );
-  },
-),
 
             // ListView.builder(
             //   itemCount: messages.length,
@@ -177,12 +177,14 @@ class _ChatPageState extends State<ChatPage> {
               IconButton(
                 icon: Icon(Icons.send),
                 onPressed: () async {
-                                    DBservice db = DBservice(id: id);
+                  DBservice db = DBservice(id: id);
+                  print(widget.personName);
+                  String? receiverkey = await db.receiverkey(widget.personName);
 
                   String formattedTime =
                       DateFormat('HH:mm:ss').format(DateTime.now());
                   //  print(name);
-                  List list = await crypto(_messageController.text);
+                  List list = await cryptoclient(_messageController.text);
                   Map<String, dynamic> message = {
                     'text': list[1],
                     'key': list[0],
@@ -191,8 +193,18 @@ class _ChatPageState extends State<ChatPage> {
                     'destination': widget.personName,
                     'time': formattedTime
                   };
-                  String response =
-                      await db.sendertoreceiver(widget.personName, message);
+                  List list1 = await cryptoreceiver(
+                      _messageController.text, receiverkey!);
+                  Map<String, dynamic> messagereceiver = {
+                    'text': list1[1],
+                    'key': list1[0],
+                    'iv': list1[2],
+                    'sendby': name,
+                    'destination': widget.personName,
+                    'time': formattedTime
+                  };
+                  String response = await db.sendertoreceiver(
+                      widget.personName, messagereceiver, message);
                   //  print(response);
                   _messageController.clear();
                   await getMessages(
