@@ -22,6 +22,20 @@ class DBservice {
         .get()
         .then((value) => (value.data() as Map<String, dynamic>)['name']);
   }
+Future<Map<String, dynamic>?> retriveUserInfo(String? id) async {
+  final documentSnapshot = await _usersCollection.doc(id).get();
+  final userData = documentSnapshot.data() as Map<String, dynamic>?;
+
+  if (userData != null) {
+    final String name = userData['name'] as String;
+    final String? publicKey = userData['publickey'] as String?;
+    final String? privateKey = userData['privatekey'] as String?;
+    
+    return {'name': name, 'publicKey': publicKey, 'privateKey': privateKey};
+  } else {
+    return null;
+  }
+}
 
   Future<List<dynamic>?> getContacts(String? id) async {
     print(id);
@@ -144,7 +158,9 @@ class DBservice {
     }
   }
 
-  Future<void> setPublicKey(String key) async {
-    return _usersCollection.doc(id).update({'publickey': key});
+  Future<void> setPublicKey(String publickey,String privatekey) async {
+    return _usersCollection.doc(id).update({'publickey':publickey,
+    'privatekey':privatekey
+    });
   }
 }

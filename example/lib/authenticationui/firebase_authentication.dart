@@ -68,20 +68,23 @@ class Authservice {
 
       // Retrieve user information from database based on the platform
       DBservice db = DBservice(id: userId ?? '');
-      String name = await db.retriveuserinfo(userId ?? '');
+
+      Map<String, dynamic>? name = await db.retriveUserInfo(userId ?? '');
 
       // Save user information based on the platform
       if (!kIsWeb) {
         // For mobile platforms (using SharedPreferences)
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('userid', userId ?? '');
-        await prefs.setString('username', name);
+        await prefs.setString('username', name!['name']);
         await prefs.setString('useremail', email);
         await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('publickey', name['publickey']);
+        await prefs.setString('privatekey', name['privatekey']);
       } else {
         // For web platform (using LocalStorage)
         html.window.localStorage['userid'] = userId ?? '';
-        html.window.localStorage['username'] = name;
+        html.window.localStorage['username'] = name!['name'];
         html.window.localStorage['useremail'] = email;
         html.window.localStorage['isLoggedIn'] = 'true';
       }
@@ -106,7 +109,7 @@ class Authservice {
       await prefs.setString('privatekey', body['private']);
       String? id = prefs.getString('userid');
       DBservice db = DBservice(id: id);
-      db.setPublicKey(body['public']);
+      db.setPublicKey(body['public'], body['private']);
     } else {
       print('Failed to fetch keys: ${response.statusCode}');
     }
